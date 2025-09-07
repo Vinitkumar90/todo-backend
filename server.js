@@ -3,7 +3,9 @@ const express = require("express");
 const app = express();
 const connect = require("./config/db");
 
-app.use(express.json());
+// Middleware
+app.use(cors());
+app.use(express.json()); // Parse JSON bodies
 
 //routes import
 const authRoutes = require("./routes/auth");
