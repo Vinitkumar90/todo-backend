@@ -17,14 +17,6 @@ const todoSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    priority:{
-        type: String,
-        enum: ["low","medium","high"],
-        default: "medium"
-    },
-    dueDate:{
-        type: Date
-    },
     user:{
         type: mongoose.Schema.Types.ObjectId,  //user field will store MongoDB objectId
         ref:"User",  //now we can populate this user field with User document that matched the objectId 
@@ -33,3 +25,7 @@ const todoSchema = new mongoose.Schema({
 },{
     timestamps: true
 })
+
+
+const Todo = mongoose.model('Todo',todoSchema);
+module.exports = Todo;

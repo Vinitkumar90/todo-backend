@@ -25,7 +25,6 @@ const userSchema = new mongoose.Schema({
         type: String, 
         required: [true, "please enter the password"],
         minlength: [6, "enter password with length greater than 6"],
-        select: false //ye exclude krdeta hai password ko from queries
                       
     }
 },{
@@ -34,11 +33,11 @@ const userSchema = new mongoose.Schema({
 
 //now we will hash password before saving to db
 //adding pre
-userSchema.pre('save', async (next) => {
+userSchema.pre('save', async function(next){
     try{
-        //hash the password with salt rounds
-        const salt = await bcrypt.genSalt(12)
-        this.password = bcrypt.hash(this.password,salt);
+        if(!this.isModified("password"))return next()
+        //hash the password before saving
+        this.password = await bcrypt.hash(this.password,10); //salt rounds = 10
         next();
     }catch(error){
         next(error)
@@ -46,12 +45,14 @@ userSchema.pre('save', async (next) => {
 })
 
 //instance method to compare password
-userSchema.methods.comparePassword = async (candidatePassword) => {
-    return bcrypt.compare(candidatePassword,this.password);
+userSchema.methods.comparePassword = async function(enteredPassword){
+    console.log("Entered password:", enteredPassword);
+  console.log("Stored hash:", this.password);
+    return await bcrypt.compare(enteredPassword, this.password);
 }
 
 //instance method to generate jwt
-userSchema.methods.generateAuthToken = () => {
+userSchema.methods.generateAuthToken =  function(){
     return jwt.sign({userId:this._id},process.env.JWT_SECRET,{expiresIn:'7d'})
 }
 
